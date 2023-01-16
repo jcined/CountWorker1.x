@@ -9,7 +9,7 @@ CountWorker是一个简单的开源量化面板项目。
 + ubuntu系统
 
   ```shell
-  curl -o install.sh https://github.com/jcined/CountWorker1.x/releases/download/v1.1/icountworker.sh && bash install.sh
+  wget -O install.sh https://github.com/jcined/CountWorker1.x/releases/download/v1.1/icountworker.sh && sudo bash install.sh
   ```
 
 ## 页面
