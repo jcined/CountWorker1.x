@@ -25,12 +25,7 @@ else
 
     # Install
     sudo checkinstall
-
-# Update alternatives
-sudo update-alternatives --install /usr/bin/python python /usr/local/bin/python3 1
-
-# Check the version
-python3 --version
+fi
 
 cd /
 
@@ -43,22 +38,28 @@ else
 fi
 
 # install the libraries
-pip3 install flask flask_cors flask_socketio psutil aiohttp asyncio lockfile
+pip3 install flask flask_cors flask_socketio simple-websocket psutil aiohttp asyncio lockfile
 
 # Download the zip file
 wget https://github.com/jcined/CountWorker1.x/releases/download/v1.1/CountWorker.v1.1.zip
 
 # Unzip the file to the root directory
-unzip file.zip -d /
+apt-get install unzip
+
+unzip CountWorker.v1.1.zip -d /
 
 # remove the zip file after unzipping
-rm file.zip
+rm CountWorker.v1.1.zip
 
 cd /countworker
 
 nohup python3 app.py &
 
+sudo ufw disable
+
 sleep 5
 
 python3 sys.py
+
+
 
