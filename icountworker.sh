@@ -8,23 +8,23 @@ version=`python3 --version`
 if [[ $version == *"3.11"* ]]; then
     echo "Python 3.11 is already installed."
 else
-    # Install dependencies
-    sudo apt-get install -y build-essential checkinstall
+# Install dependencies
+    sudo apt-get install -y build-essential
     sudo apt-get install -y libreadline-gplv2-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev
-
     # Download and extract Python 3.11 source code
     wget https://www.python.org/ftp/python/3.11.0/Python-3.11.0.tgz
     tar -xvf Python-3.11.0.tgz
-
     # Enter the extracted folder
     cd Python-3.11.0
-
     # Configure and make
     ./configure
     make
-
     # Install
-    sudo checkinstall
+    sudo make altinstall
+    cd ..
+    # Remove downloaded file and build files
+    rm Python-3.11.0.tgz
+    rm -rf Python-3.11.0
 fi
 
 cd /
