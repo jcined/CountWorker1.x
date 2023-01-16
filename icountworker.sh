@@ -8,6 +8,8 @@ version=`python3 --version`
 if [[ $version == *"3.11"* ]]; then
     echo "Python 3.11 is already installed."
 else
+    sudo apt-get remove python3
+
     sudo apt-get install -y software-properties-common
 
     # Add the deadsnakes PPA to get access to the latest versions of Python
