@@ -38,7 +38,7 @@ else
 fi
 
 # install the libraries
-pip3 install flask flask_cors flask_socketio simple-websocket psutil aiohttp asyncio lockfile
+pip3 install flask flask_cors flask_socketio simple-websocket requests psutil aiohttp asyncio lockfile
 
 # Download the zip file
 wget https://github.com/jcined/CountWorker1.x/releases/download/v1.1/CountWorker.v1.1.zip
