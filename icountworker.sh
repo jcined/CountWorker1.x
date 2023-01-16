@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Update package list and upgrade existing packages
+# Update the package list
 sudo apt-get update
 
 # Check if python3.11 is already installed
@@ -8,17 +8,29 @@ version=`python3 --version`
 if [[ $version == *"3.11"* ]]; then
     echo "Python 3.11 is already installed."
 else
-    sudo apt-get remove python3
+    # Install dependencies
+    sudo apt-get install -y build-essential checkinstall
+    sudo apt-get install -y libreadline-gplv2-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev
 
-    sudo apt-get install -y software-properties-common
+    # Download and extract Python 3.11 source code
+    wget https://www.python.org/ftp/python/3.11.0/Python-3.11.0.tgz
+    tar -xvf Python-3.11.0.tgz
 
-    # Add the deadsnakes PPA to get access to the latest versions of Python
-    sudo add-apt-repository ppa:deadsnakes/ppa
+    # Enter the extracted folder
+    cd Python-3.11.0
 
-    # Install Python 3.11
-    sudo apt-get install -y python3.11 python3.11-dev python3.11-venv
+    # Configure and make
+    ./configure
+    make
 
-    sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1
+    # Install
+    sudo checkinstall
+
+    # Update alternatives
+    sudo update-alternatives --install /usr/bin/python python /usr/local/bin/python3 1
+
+    # Check the version
+    python3 --version
 fi
 
 cd /
