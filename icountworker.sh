@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Update package list and upgrade existing packages
-sudo apt-get update && sudo apt-get upgrade
+sudo apt-get update
 
 # Check if python3.11 is already installed
 version=`python3 --version`
@@ -9,9 +9,6 @@ if [[ $version == *"3.11"* ]]; then
     echo "Python 3.11 is already installed."
 else
     sudo apt-get install -y software-properties-common
-
-    # Update package list and upgrade existing packages
-    sudo apt-get update && sudo apt-get upgrade -y
 
     # Add the deadsnakes PPA to get access to the latest versions of Python
     sudo add-apt-repository ppa:deadsnakes/ppa
