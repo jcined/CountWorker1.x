@@ -6,6 +6,7 @@ import json
 import func
 import os
 import subprocess
+import importlib
 
 api = Blueprint('api', __name__)
 
@@ -56,7 +57,8 @@ class StrategyThread:
             with open(filename, "r") as f:
                 process_info = json.load(f)
                 return process_info["pid"]
-        except:
+        except Exception as e:
+            print(e)
             return None
 
 
@@ -147,12 +149,14 @@ def upload():
             data=[data["Files"]["main"], data["Files"]["config"]],
             fileName=["main.py", "config.py"]
         )
-    except:
+    except Exception as e:
+        print(f"152行:{e}")
         return Response(F("1003", "Failed to read the uploaded files")), 400
 
     try:
         func.UpDate().toPython(data=[data["Files"]["chart"]], fileName=["chart.py"])
-    except:
+    except Exception as e:
+        print(f"158行:{e}")
         pass
 
     # 其他文件处理
@@ -162,7 +166,9 @@ def upload():
 
     # 读取config.py并创建json
     try:
-        import strategy.code.config as scc
+        scc = importlib.import_module("strategy.code.config")
+        importlib.reload(scc)
+        print("scc:",scc)
         config = {
             "Name": scc.name,
             "state": False,
@@ -173,15 +179,20 @@ def upload():
         }
         try:
             config["exchanges"] = scc.exchanges
-        except:
+        except Exception as e:
+            print(f"184:{e}")
             config["exchanges"] = []
         try:
             config["config"] = scc.config
-        except:
+            print(scc.config)
+        except Exception as e:
+            print(f"190:{e}")
             config["config"] = []
+        print(config)
         func.write_json("strategy/code/UserSetConfig.json", config)
         return Response(F("0000", True, config)), 200
-    except:
+    except Exception as e:
+        print(f"196:{e}")
         return Response(F("1004", "Failed to write configuration information")), 400
 
 
