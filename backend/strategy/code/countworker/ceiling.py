@@ -2,6 +2,7 @@ import sqlite3
 import aiohttp
 import asyncio
 
+
 # 发送请求
 async def send_request_loop(path: str, message: dict) -> None:
     url = f'http://127.0.0.1:10010{path}'
@@ -15,9 +16,12 @@ def send_request(path: str, message: dict) -> None:
 
 
 def insertLog(time: int, type: str, info: str):
-    db = SQLiteOperator()
-    db.insert_data("logs", "time, type, info", f"'{str(time)}', '{str(type)}', '{str(info)}'")
-    db.close()
+    try:
+        db = SQLiteOperator()
+        db.insert_data("logs", "time, type, info", f"'{str(time)}', '{str(type)}', '{str(info)}'")
+        db.close()
+    except Exception as e:
+        print(e)
 
 
 # sqlite操作
@@ -31,7 +35,8 @@ class SQLiteOperator:
         self.conn.commit()
 
     def insert_data(self, table_name, columns, values):
-        self.cursor.execute(f"INSERT INTO {table_name}({columns}) VALUES({values})")
+        self.cursor.execute("INSERT INTO {}({}) VALUES({})".format(table_name, columns, ",".join(["?"] * len(values))),
+                            values)
         self.conn.commit()
 
     def select_data(self, table_name, columns="*", condition=""):
@@ -49,4 +54,3 @@ class SQLiteOperator:
     def close(self):
         self.cursor.close()
         self.conn.close()
-
