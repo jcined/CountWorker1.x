@@ -5,6 +5,7 @@ import strategy.code.countworker.exchanges.ExchangeFactory as Factory
 
 
 class Exchange(Basics, Chart):
+
     # 策略名称
     Name: str = None
 
@@ -13,7 +14,7 @@ class Exchange(Basics, Chart):
 
     def __init__(self):
         self.__exchange: str | None = None  # 交易所
-        self.__name: str | None = None  # 交易对
+        self.__symbol: str | None = None  # 交易对
         self.__agent = None  # 代理
 
     # 设置交易对
@@ -58,7 +59,7 @@ class Exchange(Basics, Chart):
     # 获取交易对
     @property
     def symbol(self):
-        return self.__name
+        return self.__symbol
 
     # 获取配置
     @classmethod
