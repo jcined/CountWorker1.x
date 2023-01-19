@@ -4,6 +4,8 @@ from main import Main
 import function
 import time
 import copy
+import sys
+sys.path.append("/countworker/")
 import func
 from countworker.func import log
 
@@ -78,7 +80,7 @@ if __name__ == "__main__":
             workers[exchange].__SetExchanges__(info)
 
         print("策略已启动")
-        Main().init()  # 策略初始化
+        Main.init()  # 策略初始化
         for worker in workers:
             worker.before_start()  # 交易对初始化
         while True:
