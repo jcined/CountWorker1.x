@@ -195,4 +195,4 @@ if __name__ == "__main__":
     app.register_blueprint(api, url_prefix='/api')
     app.register_blueprint(active, url_prefix='/api/active')
     app.register_blueprint(s, url_prefix='/s')
-    socketio.run(app, port=10010, host="0.0.0.0")
+    socketio.run(app, port=10010, host="0.0.0.0", allow_unsafe_werkzeug=True)
