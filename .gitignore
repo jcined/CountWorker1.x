@@ -2,7 +2,7 @@
 node_modules
 /dist
 /document
-/static
+static
 /examplePage
 
 
@@ -17,9 +17,10 @@ yarn-error.log*
 pnpm-debug.log*
 
 # Editor directories and files
-*__pycache__*
+__pycache__
 .idea
 .vscode
+*.zip
 *.suo
 *.ntvs*
 *.njsproj
