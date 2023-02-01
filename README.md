@@ -14,6 +14,8 @@ CountWorker是一个简单的开源量化面板项目。
 
 ## 页面
 
+![](https://raw.githubusercontent.com/jcined/CountWorker1.x/main/examplePage/house.png))
+
 ![](https://raw.githubusercontent.com/jcined/CountWorker1.x/main/examplePage/chart.png)
 
 
