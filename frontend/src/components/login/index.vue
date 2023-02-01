@@ -3,7 +3,7 @@
         <transition enter-active-class="animate__animated animate__fadeIn" appear>
             <v-card class="mx-auto px-6 py-8" max-width="344" style="width: 100%;">
                 <div class="header">
-                    <img src="../../assets/Logo.png">
+                    <img src="../../assets/logo.png">
                     <div>CountWorker</div>
                 </div>
 
@@ -30,7 +30,7 @@
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
-import socketio from '../../hooks/Sinit'
+import {Url} from '../../Store/store'
 import axios from 'axios'
 
 const form = ref(false)
@@ -38,12 +38,14 @@ const account = ref()
 const password = ref()
 const loading = ref()
 
+const url = Url()
+
 const router = useRouter()
 
 const onSubmit = () => {
     if (!form.value) return
     loading.value = true
-    axios.post('/api/login', {
+    axios.post(`${url.ip}${url.login}`, {
         "account": account,
         "password": password,
     })
@@ -53,7 +55,7 @@ const onSubmit = () => {
                 message: '登录成功',
                 type: 'success',
             })
-            router.replace('/chart')
+            location.replace("/")
         })
         .catch((error) => {
             console.log(error)
