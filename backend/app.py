@@ -4,10 +4,9 @@ from flask import render_template, redirect
 from flask import Blueprint, request, Response
 from flask_cors import CORS
 from flask_socketio import SocketIO
-from blueprint.api.index import api
-from blueprint.api.active.index import active
+from blueprint.api import api
+from blueprint.active import active
 import func
-import psutil
 from func import *
 from queue import Queue
 
@@ -43,26 +42,37 @@ wsAPIdata = WSThread('/api')
 wsAPIdata.start()  # 启动线程
 
 
-@app.route('/')
 @app.route('/login')
-@app.route('/chart')
-@app.route('/logs')
-@app.route('/setting')
-def template():
+def login():
+    return render_template('index.html')
+
+
+@app.route('/s/code/<id>')
+@app.route('/code')
+@app.route('/live')
+@app.route('/')
+def template(id=None):
     ver = func.verToken(request.cookies.get("token"), "./admin/account.json")
-    print(ver)
+    if not ver:
+        return redirect('/login')
+    elif request.path == "/login" and ver:
+        return redirect('/')
+    return render_template('index.html')
+
+
+@app.route('/live/chart/<id>')
+@app.route('/live/logs/<id>')
+@app.route('/live/setting/<id>')
+def live(id):
+    ver = func.verToken(request.cookies.get("token"), "./admin/account.json")
     if request.path != "/login" and not ver:
         return redirect('/login')
-    elif request.path == "/login" and ver or request.path == "/":
-        return redirect('/chart')
-    return render_template('index.html')
+    return render_template('live.html')
 
 
 # 验证ip
 @s.before_request
 def verS():
-    # if request.remote_addr != ip:
-    #     return Response(F("1006", "The IP address is incorrect")), 400
     if wsAPIdata.stop_requested is None:
         return Response(F("0000", True)), 200
 
@@ -70,10 +80,14 @@ def verS():
 @s.route('/error')
 def error():
     print("策略意外退出")
-    path = "./strategy/code/UserSetConfig.json"
+    id = request.args.get('id')
+    path = f"strategy/Lives/{id}/UserSetConfig.json"
     Config = func.read_json(path)
     Config["state"] = False
     func.write_json(path, Config)
+    live_data = func.read_json("./strategy/Lives.json")
+    live_data[id]["pid"] = None
+    func.write_json("./strategy/Lives.json", data=live_data)
     wsAPIdata.WSDATA.put(wsData("error", None))
     return Response(F("0000", True)), 200
 
@@ -81,6 +95,7 @@ def error():
 # 收到日志信息
 @s.route('/log', methods=["POST"])
 def Get_log():
+    id = request.args.get('id')
     try:
         if not wsAPIdata.stop_requested:
             data = json.loads(request.get_data())["message"]
@@ -90,6 +105,7 @@ def Get_log():
                     "time": data["time"],
                     "type": data["type"],
                     "info": data["info"],
+                    "live_id": id,
                 }))
             except:
                 pass
@@ -101,15 +117,17 @@ def Get_log():
 # 收到状态更新
 @s.route('/state', methods=["POST"])
 def Get_state():
+    id = request.args.get('id')
     print("接收到状态更新")
     state = json.loads(request.get_data())["message"]["state"]
-    path = "./strategy/code/UserSetConfig.json"
+    path = f"./strategy/Lives/{id}/UserSetConfig.json"
     data = func.read_json(path)
     data["stateCus"] = state
     func.write_json(path, data)
     try:
         wsAPIdata.WSDATA.put(wsData("state", {
             "state": state,
+            "live_id": id,
         }))
         return Response(F("0000", True)), 200
     except Exception as e:
@@ -120,6 +138,7 @@ def Get_state():
 # 收到图表更新
 @s.route('/chart', methods=["POST"])
 def Get_chart():
+    id = request.args.get('id')
     print("接收到图表更新")
     data = json.loads(request.get_data())["message"]
     try:
@@ -127,6 +146,7 @@ def Get_chart():
             "index": data["index"],
             "type": data["type"],
             "data": data["newdata"],
+            "live_id": id,
         }))
         return Response(F("0000", True)), 200
     except:
@@ -136,12 +156,14 @@ def Get_chart():
 # 收到收益更新
 @s.route('/profit', methods=["POST"])
 def Get_profit():
+    id = request.args.get('id')
     print("接收到收益更新")
     data = json.loads(request.get_data())["message"]
     try:
         wsAPIdata.WSDATA.put(wsData("profit", {
             "time": data["time"],
             "value": data["value"],
+            "live_id": id,
         }))
         return Response(F("0000", True)), 200
     except Exception as e:
@@ -167,32 +189,8 @@ def ws_disconnect():
     wsAPIdata.stop()
 
 
-def ResetPid():
-    def changeState(state: bool):
-        path = "./strategy/code/UserSetConfig.json"
-        data = func.read_json(path)
-        data["state"] = state
-        func.write_json(path, data)
-
-    PATH = "./strategy/data/strategyProcess.json"
-    try:
-        pid = func.read_json(PATH)["pid"]
-        current_process = psutil.Process(pid)
-        script_name = current_process.cmdline()[-1]
-        if script_name == './strategy/code/run.py':
-            changeState(True)
-            print("重置为true")
-        else:
-            raise ValueError("error")
-    except Exception as e:
-        print(e)
-        func.write_json(PATH, {"pid": None})
-        changeState(False)
-
-
 if __name__ == "__main__":
     SetSeverConfig()
-    ResetPid()
     CORS(app, origins='*', websocket_origins='*')
     app.register_blueprint(api, url_prefix='/api')
     app.register_blueprint(active, url_prefix='/api/active')
