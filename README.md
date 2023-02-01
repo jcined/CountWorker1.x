@@ -22,4 +22,4 @@ CountWorker是一个简单的开源量化面板项目。
 
 ## 文档
 
-https://countworker-doc.readthedocs.io/en/latest/
+https://countworker-doc.readthedocs.io
