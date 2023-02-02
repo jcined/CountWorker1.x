@@ -22,8 +22,8 @@ def verCookie():
 @active.route('/button/<key>')
 def button(key):
     id = request.args.get('id')
-    if func.read_json(f"./strategy/{id}/UserSetConfig.json")["state"]:
-        path = f'./strategy/{id}/data/button.json'
+    if func.read_json(f"./strategy/Lives/{id}/UserSetConfig.json")["state"]:
+        path = f'./strategy/Lives/{id}/data/button.json'
         lock = FileLock(path)
         lock.acquire()
         try:
